@@ -1,0 +1,226 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'index.css'%}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weight Data</title>
+</head>
+{% block content %}
+<body id="page">
+    <div>
+        <div id="topbar">
+            <nav class="navbar navbar-light bg-light">
+                <a class="navbar-brand" href="/">
+                <img src="{% static 'logo.png' %}" height="50px" alt="">
+                </a>
+                <ul class="nav">
+                    <li class="nav-item">
+                    <a class="nav-link active" href="/">DỮ LIỆU TỨC THỜI</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">DỮ LIỆU</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div style="padding-top: 10px">
+        <div class="col">
+            <div class="card card-body">
+                <form method="get">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-2">
+                                <label for="inputEmail3" class="col-form-label">Lane:{{myfilter.lane}}</label>
+                            </div>
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">UniqueNumber: {{myfilter.uniqueNumber}}</label>
+                            </div>
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">Number front plate: {{myfilter.front_license_number}}</label>
+                            </div>
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">Number front plate: {{myfilter.front_license_number}}</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">From date: {{myfilter.start_date}}</label>
+                            </div>
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">To date: {{myfilter.end_date}}</label>
+                            </div>
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">From Time: {{myfilter.start_time}}</label>
+                            </div>
+                            <div class="col">
+                                <label for="inputEmail3" class="col-form-label">To Time: {{myfilter.end_time}}</label>
+                            </div>
+                            <div style="margin-top: 25px;" class="col align-self-center" >
+                                <button class="btn btn-primary" type="submit">Search</button>
+                                <a href="{% url 'export-csv' %}?{{ request.GET.urlencode }}"" class="btn btn-success">Export</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div style="padding-top: 10px">
+        <div class="row">
+            <p style="font-size: 20px; text-align: center;"><b>Total: {{numberCar}}</b></p>
+        </div>
+        <div class="col-md">
+            <div div class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table table-bordered table-striped mb-1">
+                    <thead>
+                        <tr>
+                            <th>Lane</th>
+                            <th>Unique Number</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                            <th>Front License Number</th>
+                            <th>End License Number</th>
+                            <th>Velocity</th>
+                            <th>Number Axis</th>
+                            <th>Total Weight</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for car in cardata %}
+                            <tr>
+                                <td>{{car.lane}}</td>
+                                <td>{{car.uniqueNumber}}</td>
+                                <td>{{car.time}}</td>
+                                <td>{{car.date}}</td>
+                                <td>{{car.front_license_number}}</td>
+                                <td>{{car.end_license_number}}</td>
+                                <td>{{car.velocity}}</td>
+                                <td>{{car.number_axis}}</td>
+                                <td>{{car.totalweight}}</td>
+                                <td>
+                                    <div data-toggle="modal" data-target="#previewCarmodal">
+                                        <button type="button" class="btn btn-sm btn-info" onclick="loadPreview('{{ car.lane }}','{{ car.uniqueNumber }}','{{ car.time }}','{{ car.date }}','{{ car.front_license_number }}','{{ car.front_license_image }}','{{ car.front_car_image }}','{{ car.end_license_number }}','{{ car.end_license_image }}','{{ car.end_car_image }}','{{ car.velocity }}','{{ car.number_axis }}','{{ car.totalweight }}','{{ car.listweight }}','{{ car.maxD }}','{{ car.listD }}')" >Preview</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="previewCarmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="height: 10px;">
+                    <h5 class="modal-title" id="exampleModalLabel">View</h5>
+                </div>
+                <div class="modal-body" id ="modal-body">
+                    <div class="row">
+                        <div class="col-xs-6 col-md-6">
+                            <div class="card">
+                                <div class="grid-item item1">
+                                    <div class="parent">
+                                        <img class="img-responsive" style="max-width:100%;" id="fontfullView" src="{% static 'NONEIMG.jpg' %}" alt="My image"/>
+                                        <img class="img-responsive" style="max-width:20%;" id="fontplate" src="{% static 'NONEPLATE.jpg' %}" alt="My image"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div class="card">
+                                <div class="grid-item item2">
+                                    <div class="parent">
+                                        <img class="img-responsive" style="max-width:100%;" id="endfullView" src="{% static 'NONEIMG.jpg' %}" alt="My image"/>
+                                        <img class="img-responsive" style="max-width:20%;" id="endplate" src="{% static 'NONEPLATE.jpg' %}" alt="My image"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col">
+                            <div class="row">
+                                <p>Lane:</p>
+                                <p id="lane"> ****</p>
+                            </div>
+                            
+                        <div class="col" style="background-color: aqua;">
+                            <div class="col"><p>UniqueNumber:</p></div>
+                            <div class="col"></div><p id="uniqueNumber">****</p></div>
+                        </div>
+                        <div class="col">
+                            <p id="time">****</p>
+                        </div>
+                        <div class="col">
+                            <p id="date">****</p>
+                        </div>
+                    </div>
+                    <!-- <p id="uniqueNumber">*</p> -->
+                    <!-- <img class="image2" id="endplate" src="{% static 'NONEIMG.jpg' %}" alt="My image"/> -->
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Print</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <!--Pagination-->
+        <div class="row">
+            {% if cardata.has_other_pages %}
+                <ul id="mypagination" class="pagination justify-content-center">
+                    {% if cardata.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ cardata.previous_page_number }}">&laquo</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link"><span>&laquo</span></a></li>
+                    {% endif %}
+    
+                    {% for i in cardata.paginator.page_range %}
+                        {% if cardata.number == i %}
+                            <li class="page-item active"><a class="page-link"><span>{{ i }}</span></a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+    
+                    {% if cardata.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ cardata.next_page_number }}">&raquo</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link"><span>&raquo</span></a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </div>
+        <!--end of Pagination-->
+    </div>
+</body>
+<script>
+    function loadPreview(lane,uniqueNumber,time,date,front_license_number,front_license_image,front_car_image,end_license_number,end_license_image,end_car_image,velocity,number_axis,totalweight,listweight,maxD,listD){
+        
+        // modalBody.textContent = data.uniqueNumber;
+
+        if ((front_license_image !== "")){
+            console.log("-->" + front_license_image);
+            fontplate.src = 'media/' + front_license_image;
+        }  
+        console.log("lane:" + lane)
+        console.log("uniqueNumber:" + uniqueNumber) 
+        console.log("time:" + time) 
+        console.log("date:" + date) 
+        console.log("front_license_number:" + front_license_number) 
+        console.log("front_license_image:" + front_license_image) 
+    }
+
+    var modalBody = document.getElementById("uniqueNumber");
+    var endplate = document.getElementById("endplate");
+    var fontplate = document.getElementById("fontplate");
+</script>
+{% endblock content %}

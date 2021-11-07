@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'index.css'%}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weight In Motion</title>
+    <script>
+        let socket =new WebSocket('ws://192.168.1.34:8000/ws/polData/');
+        // let socket =new WebSocket('ws://113.160.97.105:8000/ws/polData/');
+        socket.onopen =function(e){
+            alert('Connection established');
+        };
+
+        socket.onmessage = function(e){
+            var recData=JSON.parse(e.data);
+            console.log(recData);
+            // frontIMGdata = recData['value'];
+            getSRC(fontfullViewIMG,fontplateIMG,endfullViewIMG,endplateIMG,id,day,time,frontcarnumber,endcarnumber,lane,velocity,Dlist,Dmax,Wlist,Wtotal,numberaxis,recData["value"]);
+        };
+
+        socket.onclose = function(e){
+            alert('Connection CLosed');
+        };
+    </script>
+</head>
+<body>
+    <div id="page">
+        <div id="topbar">
+            <nav class="navbar navbar-light bg-light">
+                <a class="navbar-brand" href="/">
+                  <img src="{% static 'logo.png' %}" height="50px" alt="">
+                </a>
+                <ul class="nav">
+                    <li class="nav-item">
+                      <a class="nav-link active" href="/">DỮ LIỆU TỨC THỜI</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="data/">DỮ LIỆU</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="gird-info">
+                <div class="grid-if info1">
+                    <p>CỤC QUẢN LÝ ĐƯỜNG BỘ</p>
+                </div>
+                <div class="grid-if info2">
+                    <p>Lý trình: KM78+830/QL5</p>
+                </div>
+                <div class="grid-if info3">
+                    <p>Làn:</p>
+                    <p id="lane">*</p>
+                </div>
+                <div class="grid-if info4">
+                    <p>BỘ CÂN KTTTX QL.5, AN DƯƠNG, HẢI PHÒNG</p>
+                </div>
+                <div class="grid-if info5">
+                    <p>Số phiếu cân:</p>
+                    <p id="id">**********</p>
+                </div>
+                <div class="grid-if-ticket info6">
+                    PHIẾU CÂN TRẢI TRỌNG XE
+                </div>
+            </div>
+            <div class="grid-container">
+                <div class="grid-item item1">
+                    <div class="parent">
+                        <img class="image1" id="fontfullView" src="{% static 'NONEIMG.jpg' %}" alt="My image"/>
+                        <img class="image2" id="fontplate" src="{% static 'NONEPLATE.jpg' %}" alt="My image"/>
+                    </div>
+                </div>
+                <div class="grid-item item2">
+                    <div class="parent">
+                        <img class="image1" id="endfullView" src="{% static 'NONEIMG.jpg' %}" alt="My image"/>
+                        <img class="image2" id="endplate" src="{% static 'NONEPLATE.jpg' %}" alt="My image"/>
+                    </div>
+                </div>
+                <div class="grid-item item3">
+                    <p>Ngày:</p>
+                    <p id="day">******</p>
+                </div>  
+                <div class="grid-item item4">
+                    <p>Thời gian:</p>
+                    <p id="time">******</p>
+                </div>
+                <div class="grid-item item5">
+                    <p>Biển số xe trước:</p>
+                    <p id="frontcarnumber">******</p>
+                </div>  
+                <div class="grid-item item6">
+                    <p>Biển số xe sau:</p>
+                    <p id="endcarnumber">******</p>
+                </div>
+                <div class="grid-item item7">
+                    <p>Làn xe:</p>
+                    <p id="lane">*</p>
+                </div>
+                <div class="grid-item item8">
+                    <p>Vận tốc:</p>
+                    <p id="velocity">**.*</p>
+                </div>
+                <div class="grid-item item9">
+                    <p>Số truc:</p>
+                    <p id="numberaxis">*</p>
+                </div>
+                <div class="grid-item item10">
+                    <p>Khoảng cách trục:</p>
+                    <p id="Dlist">*</p>
+                </div>  
+                <div class="grid-item item11">
+                    <p>D-max:</p>
+                    <p id="Dmax">*</p>
+                </div>
+                <div class="grid-item item12">
+                    <p>Khối lượng trục:</p>
+                    <p id="Wlist">*</p>
+                </div>
+                <div class="grid-item item13">
+                    <p>Khối lượng:</p>
+                    <p id="Wtotal">*</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    function getSRC(fontfullViewIMG,fontplateIMG,endfullViewIMG,endplateIMG,id,day,time,frontcarnumber,endcarnumber,lane,velocity,Dlist,Dmax,Wlist,Wtotal,numberaxis,sourcevalue){
+        fontfullViewIMG.src = sourcevalue["fullviewfront"];
+        fontplateIMG.src = sourcevalue["platefront"];
+        endfullViewIMG.src = sourcevalue["fullviewend"];
+        endplateIMG.src = sourcevalue["plateend"];
+
+        id.textContent = sourcevalue["id"];
+        day.textContent = sourcevalue["day"],
+        time.textContent = sourcevalue["time"]
+        frontcarnumber.textContent = sourcevalue["platefrontnumber"];
+        endcarnumber.textContent = sourcevalue["plateendnumber"];
+        lane.textContent = sourcevalue["lane"];
+        velocity.textContent = sourcevalue["velocity"];
+        numberaxis.textContent = sourcevalue["numberaxis"];
+        Dlist.textContent = sourcevalue["listD"];
+        Dmax.textContent = sourcevalue["maxD"];
+        Wlist.textContent = sourcevalue["listweight"];
+        Wtotal.textContent = sourcevalue["totalweight"];
+    }
+
+    var fontfullViewIMG = document.getElementById("fontfullView");
+    var fontplateIMG = document.getElementById("fontplate");
+    var endfullViewIMG = document.getElementById("endfullView");
+    var endplateIMG = document.getElementById("endplate");
+
+    var id = document.getElementById("id");
+    var time = document.getElementById("time")
+    var frontcarnumber = document.getElementById("frontcarnumber");
+    var endcarnumber = document.getElementById("endcarnumber");
+    var lane = document.getElementById("lane");
+    var velocity = document.getElementById("velocity");
+    var Dlist = document.getElementById("Dlist");
+    var Dmax = document.getElementById("Dmax");
+    var Wlist = document.getElementById("Wlist");
+    var Wtotal = document.getElementById("Wtotal");
+    var numberaxis = document.getElementById("numberaxis");
+</script>
+</html>
