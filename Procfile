@@ -1,1 +1,1 @@
-web: python manage.py collectstatic --no-input; gunicorn viewdata.wsgi
+web: python3 manage.py collectstatic --no-input; gunicorn viewdata.wsgi
