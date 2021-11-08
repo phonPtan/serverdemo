@@ -1,1 +1,1 @@
-web: gunicorn viewdata:wsgi
+web: gunicorn viewdata.wsgi
